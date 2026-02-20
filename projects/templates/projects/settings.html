@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings | Dovepeak Projects Log{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h2 class="fw-bold mb-4">Account Settings</h2>
+        
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header">
+                <i class="fas fa-user-circle me-2 text-primary"></i> Profile Information
+            </div>
+            <div class="card-body p-4">
+                <div class="row mb-3">
+                    <div class="col-sm-3 text-muted">Username</div>
+                    <div class="col-sm-9 fw-bold">{{ user.username }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3 text-muted">Email Address</div>
+                    <div class="col-sm-9">{{ user.email|default:"Not provided" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3 text-muted">Member Since</div>
+                    <div class="col-sm-9">{{ user.date_joined|date:"F d, Y" }}</div>
+                </div>
+                <hr>
+                <div class="alert alert-info border-0 shadow-sm" style="border-left: 4px solid var(--dpl-blue) !important;">
+                    <i class="fas fa-info-circle me-2"></i> To change your profile details or password, please contact the system administrator.
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header">
+                <i class="fas fa-sliders-h me-2 text-primary"></i> Preferences
+            </div>
+            <div class="card-body p-4">
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="emailNotif" checked>
+                    <label class="form-check-label" for="emailNotif">Email notifications for deadlines</label>
+                </div>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="darkMode">
+                    <label class="form-check-label" for="darkMode">Dark mode (Coming soon)</label>
+                </div>
+                <button class="btn btn-primary mt-3" disabled>Save Preferences</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

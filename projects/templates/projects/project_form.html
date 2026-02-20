@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Project | Dovepeak Projects Log{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="d-flex align-items-center mb-4">
+            <a href="{% if object %}{% url 'project_detail' object.id %}{% else %}{% url 'project_list' %}{% endif %}" class="btn btn-light border btn-sm me-3">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h2 class="fw-bold mb-0">{% if object %}Edit Project{% else %}New Project{% endif %}</h2>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger shadow-sm border-0 mb-4">
+            {% for error in form.non_field_errors %}
+                <p class="mb-0 small"><i class="fas fa-exclamation-circle me-2"></i> {{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_name" class="form-label fw-semibold">Project Name</label>
+                        <input type="text" name="name" id="id_name" class="form-control {% if form.name.errors %}is-invalid{% endif %}" value="{{ form.name.value|default:'' }}" placeholder="Enter project name" required>
+                        {% for error in form.name.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_client" class="form-label fw-semibold">Client Name</label>
+                        <input type="text" name="client" id="id_client" class="form-control {% if form.client.errors %}is-invalid{% endif %}" value="{{ form.client.value|default:'' }}" placeholder="Company or person name">
+                        {% for error in form.client.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_description" class="form-label fw-semibold">Description</label>
+                        <textarea name="description" id="id_description" class="form-control {% if form.description.errors %}is-invalid{% endif %}" rows="4" placeholder="Briefly describe the project goals...">{{ form.description.value|default:'' }}</textarea>
+                        {% for error in form.description.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="id_start_date" class="form-label fw-semibold">Start Date</label>
+                            <input type="date" name="start_date" id="id_start_date" class="form-control {% if form.start_date.errors %}is-invalid{% endif %}" value="{{ form.start_date.value|date:'Y-m-d'|default:'' }}">
+                            {% for error in form.start_date.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_deadline" class="form-label fw-semibold">Deadline</label>
+                            <input type="date" name="deadline" id="id_deadline" class="form-control {% if form.deadline.errors %}is-invalid{% endif %}" value="{{ form.deadline.value|date:'Y-m-d'|default:'' }}" required>
+                            {% for error in form.deadline.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_status" class="form-label fw-semibold">Status</label>
+                        <select name="status" id="id_status" class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                            <option value="NOT_STARTED" {% if form.status.value == 'NOT_STARTED' %}selected{% endif %}>Not Started</option>
+                            <option value="IN_PROGRESS" {% if form.status.value == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                            <option value="ON_HOLD" {% if form.status.value == 'ON_HOLD' %}selected{% endif %}>On Hold</option>
+                            <option value="COMPLETED" {% if form.status.value == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                            <option value="CANCELLED" {% if form.status.value == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                        {% for error in form.status.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">
+                            {% if object %}Save Changes{% else %}Create Project{% endif %}
+                        </button>
+                        <a href="{% url 'project_list' %}" class="btn btn-light border px-4">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

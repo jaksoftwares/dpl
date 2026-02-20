@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DPL | Dovepeak Projects Log{% endblock %}</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --dpl-navy: #0B1120;
+            --dpl-blue: #2563EB;
+            --dpl-blue-light: #EFF6FF;
+            --dpl-sidebar-width: 260px;
+            --dpl-header-height: 70px;
+            --dpl-bg: #F8FAFC;
+            --dpl-border: #E2E8F0;
+            --dpl-text-dark: #1E293B;
+            --dpl-text-muted: #64748B;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dpl-bg);
+            color: var(--dpl-text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--dpl-sidebar-width);
+            background-color: var(--dpl-navy);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-link {
+            padding: 0.75rem 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            color: white;
+            background: var(--dpl-blue);
+        }
+
+        /* Main Content */
+        .main-wrapper {
+            margin-left: var(--dpl-sidebar-width);
+            transition: all 0.3s;
+        }
+
+        header {
+            height: var(--dpl-header-height);
+            background: white;
+            border-bottom: 1px solid var(--dpl-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+        }
+
+        .content-area {
+            padding: 2rem;
+        }
+
+        /* UI Components */
+        .card {
+            border: 1px solid var(--dpl-border);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 1px solid var(--dpl-border);
+            padding: 1.25rem;
+            font-weight: 600;
+            border-top-left-radius: 12px !important;
+            border-top-right-radius: 12px !important;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .btn-primary {
+            background-color: var(--dpl-blue);
+            border-color: var(--dpl-blue);
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 0.5rem 1.25rem;
+        }
+
+        .btn-outline-secondary {
+            border-color: var(--dpl-border);
+            color: var(--dpl-text-dark);
+            border-radius: 8px;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background-color: var(--dpl-border);
+        }
+
+        .badge {
+            font-weight: 500;
+            padding: 0.4em 0.8em;
+            border-radius: 6px;
+        }
+
+        .badge.bg-success { background-color: #10B981 !important; }
+        .badge.bg-warning { background-color: #F59E0B !important; }
+        .badge.bg-danger { background-color: #EF4444 !important; }
+        .badge.bg-info { background-color: #3B82F6 !important; }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-wrapper {
+                margin-left: 0;
+            }
+        }
+
+        /* Page Transitions */
+        .page-fade {
+            animation: pageFadeIn 0.3s ease-out;
+        }
+
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Loading Spinner */
+        #page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+
+        #page-loader.show {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div id="page-loader">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-layer-group fa-lg"></i>
+            <h5 class="mb-0 fw-bold">DPL Solutions</h5>
+        </div>
+        <div class="py-4">
+            <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </a>
+            <a href="{% url 'project_list' %}" class="nav-link {% if 'project' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-briefcase"></i> Projects
+            </a>
+            <a href="{% url 'reminder_list' %}" class="nav-link {% if 'reminder' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-bell"></i> Reminders
+            </a>
+            <div class="mt-auto pt-4">
+                <hr class="mx-3 opacity-10">
+                <a href="{% url 'settings' %}" class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <header>
+            <div class="d-flex align-items-center">
+                <button class="btn d-lg-none me-3" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item text-muted">Pages</li>
+                        <li class="breadcrumb-item active fw-medium">{{ request.resolver_match.url_name|title }}</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end d-none d-md-block">
+                    <small class="text-muted d-block">Welcome back,</small>
+                    <span class="fw-semibold">{{ user.username }}</span>
+                </div>
+                <div class="dropdown">
+                    <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                        <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=2563EB&color=fff" width="40" height="40" class="rounded-circle shadow-sm">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                        <li><a class="dropdown-item" href="{% url 'settings' %}"><i class="fas fa-user-circle me-2 text-muted"></i> Profile</a></li>
+                        <li><a class="dropdown-item" href="{% url 'settings' %}"><i class="fas fa-cog me-2 text-muted"></i> Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{% url 'logout' %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt me-2"></i> Logout</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <main class="content-area page-fade">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 mb-4" role="alert" style="border-left: 4px solid var(--dpl-blue) !important;">
+                <i class="fas fa-check-circle me-2"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form Loading State
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function() {
+                if (this.checkValidity()) {
+                    document.getElementById('page-loader').classList.add('show');
+                }
+            });
+        });
+
+        // Auto-dismiss alerts
+        setTimeout(function() {
+            let alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                let bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
+        // Sidebar toggle for mobile
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

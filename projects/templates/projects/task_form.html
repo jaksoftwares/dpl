@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Task | Dovepeak Projects Log{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <h2 class="fw-bold mb-4">Add Task</h2>
+        
+        {% if form.errors %}
+        <div class="alert alert-danger shadow-sm border-0 mb-4">
+            <p class="mb-0 small"><i class="fas fa-exclamation-circle me-2"></i> Please correct the errors below.</p>
+        </div>
+        {% endif %}
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_title" class="form-label fw-semibold">Task Title</label>
+                        <input type="text" name="title" id="id_title" class="form-control {% if form.title.errors %}is-invalid{% endif %}" placeholder="e.g. Design homepage layout" value="{{ form.title.value|default:'' }}" required>
+                        {% for error in form.title.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_description" class="form-label fw-semibold">Description</label>
+                        <textarea name="description" id="id_description" class="form-control {% if form.description.errors %}is-invalid{% endif %}" rows="3" placeholder="Additional details...">{{ form.description.value|default:'' }}</textarea>
+                        {% for error in form.description.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="id_status" class="form-label fw-semibold">Initially Status</label>
+                            <select name="status" id="id_status" class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                                <option value="TODO" {% if form.status.value == 'TODO' %}selected{% endif %}>To Do</option>
+                                <option value="IN_PROGRESS" {% if form.status.value == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                                <option value="DONE" {% if form.status.value == 'DONE' %}selected{% endif %}>Done</option>
+                            </select>
+                            {% for error in form.status.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_due_date" class="form-label fw-semibold">Due Date</label>
+                            <input type="date" name="due_date" id="id_due_date" class="form-control {% if form.due_date.errors %}is-invalid{% endif %}" value="{{ form.due_date.value|date:'Y-m-d'|default:'' }}">
+                            {% for error in form.due_date.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">Save Task</button>
+                        <a href="javascript:history.back()" class="btn btn-light border px-4">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

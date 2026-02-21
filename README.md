@@ -167,7 +167,7 @@ Sent Status
 
 Created timestamp
 
-🚀 Installation
+d🚀 Installation
 1. Clone Repository
 git clone <your-repository-url>
 cd dpl

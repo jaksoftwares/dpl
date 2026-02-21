@@ -3,16 +3,17 @@
 {% block title %}{{ project.name }} | Dovepeak Projects Log{% endblock %}
 
 {% block content %}
+<!-- Navigation & Actions -->
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <a href="{% url 'project_list' %}" class="btn btn-outline-secondary btn-sm">
-        <i class="fas fa-arrow-left me-1"></i> Back to Projects
+    <a href="{% url 'project_list' %}" class="btn-back">
+        <i class="fas fa-arrow-left me-2"></i>Back to Projects
     </a>
     <div class="d-flex gap-2">
-        <a href="{% url 'project_update' project.id %}" class="btn btn-outline-primary btn-sm">
-            <i class="fas fa-edit me-1"></i> Edit Project
+        <a href="{% url 'project_update' project.id %}" class="btn btn-outline-primary">
+            <i class="fas fa-edit me-2"></i>Edit Project
         </a>
-        <a href="{% url 'project_delete' project.id %}" class="btn btn-outline-danger btn-sm">
-            <i class="fas fa-trash me-1"></i> Delete
+        <a href="{% url 'project_delete' project.id %}" class="btn btn-outline-danger">
+            <i class="fas fa-trash me-2"></i>Delete
         </a>
     </div>
 </div>
@@ -67,34 +68,37 @@
 
     <!-- Tasks Section -->
     <div class="col-lg-8">
-        <div class="card shadow-sm border-0">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-tasks me-2 text-primary"></i> Tasks</span>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white border-0 py-3">
+                <span class="fw-semibold"><i class="fas fa-tasks me-2 text-primary"></i>Tasks</span>
                 <a href="{% url 'task_create' project.id %}" class="btn btn-sm btn-primary">
-                    <i class="fas fa-plus"></i> Add Task
+                    <i class="fas fa-plus me-1"></i>Add Task
                 </a>
             </div>
             <div class="card-body p-0">
+                {% if project.tasks.all %}
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover mb-0">
                         <thead class="bg-light">
                             <tr>
-                                <th class="ps-4">Task</th>
+                                <th class="ps-4 rounded-top-0">Task</th>
                                 <th>Due Date</th>
                                 <th>Status</th>
-                                <th class="text-end pe-4">Actions</th>
+                                <th class="text-end pe-4 rounded-top-0">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for task in project.tasks.all %}
-                            <tr>
+                            <tr class="align-middle">
                                 <td class="ps-4">
                                     <span class="fw-medium text-dark">{{ task.title }}</span>
                                     {% if task.description %}
                                     <small class="text-muted d-block">{{ task.description|truncatechars:50 }}</small>
                                     {% endif %}
                                 </td>
-                                <td>{{ task.due_date|date:"M d"|default:"-" }}</td>
+                                <td>
+                                    <small class="{% if task.is_overdue %}text-danger{% else %}text-muted{% endif %}">{{ task.due_date|date:"M d"|default:"-" }}</small>
+                                </td>
                                 <td>
                                     <form action="{% url 'task_status_update' task.id %}" method="post" id="form-task-{{ task.id }}" class="d-inline">
                                         {% csrf_token %}
@@ -106,46 +110,63 @@
                                     </form>
                                 </td>
                                 <td class="text-end pe-4">
-                                    <a href="{% url 'task_delete' task.id %}" class="text-danger ms-2"><i class="fas fa-trash-alt"></i></a>
+                                    <a href="{% url 'task_delete' task.id %}" class="btn btn-icon-sm btn-light text-danger" title="Delete task">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
                                 </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center py-5 text-muted">No tasks assigned yet.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
+                {% else %}
+                <div class="empty-state py-4">
+                    <div class="empty-state-icon" style="width: 60px; height: 60px;">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h5>No tasks yet</h5>
+                    <p class="text-muted">Break down your project into tasks to track progress.</p>
+                    <a href="{% url 'task_create' project.id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-2"></i>Add First Task
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 
     <!-- Reminders Section -->
     <div class="col-lg-4">
-        <div class="card shadow-sm border-0">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-bell me-2 text-warning"></i> Reminders</span>
-                <a href="{% url 'reminder_create' %}?project={{ project.id }}" class="btn btn-sm btn-outline-warning">Add</a>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white border-0 py-3">
+                <span class="fw-semibold"><i class="fas fa-bell me-2 text-warning"></i>Reminders</span>
+                <a href="{% url 'reminder_create' %}?project={{ project.id }}" class="btn btn-sm btn-outline-warning">
+                    <i class="fas fa-plus me-1"></i>Add
+                </a>
             </div>
-            <div class="card-body">
-                {% for reminder in project.reminders.all %}
-                <div class="bg-light p-3 rounded mb-3 border-start border-4 {% if reminder.is_overdue %}border-danger{% else %}border-warning{% endif %}">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <small class="fw-bold {% if reminder.is_overdue %}text-danger{% else %}text-muted{% endif %}">
-                            {{ reminder.reminder_date|date:"M d, Y" }}
-                        </small>
-                        {% if reminder.is_sent %}
-                        <span class="badge bg-success" style="font-size: 0.6rem;">SENT</span>
-                        {% endif %}
+            <div class="card-body pt-0">
+                {% if project.reminders.all %}
+                    {% for reminder in project.reminders.all %}
+                    <div class="bg-light p-3 rounded mb-3 border-start border-4 {% if reminder.is_overdue %}border-danger{% else %}border-warning{% endif %}">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="fw-bold {% if reminder.is_overdue %}text-danger{% else %}text-muted{% endif %}">
+                                <i class="far fa-calendar me-1"></i>{{ reminder.reminder_date|date:"M d, Y" }}
+                            </small>
+                            {% if reminder.is_sent %}
+                            <span class="badge bg-success" style="font-size: 0.6rem;">SENT</span>
+                            {% endif %}
+                        </div>
+                        <p class="mb-0 small fw-medium">{{ reminder.message|default:"Check project status" }}</p>
                     </div>
-                    <p class="mb-0 small fw-medium">{{ reminder.message|default:"Check project status" }}</p>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state py-4">
+                    <div class="empty-state-icon" style="width: 60px; height: 60px;">
+                        <i class="fas fa-bell-slash"></i>
+                    </div>
+                    <p class="text-muted small mb-0">No reminders set.</p>
                 </div>
-                {% empty %}
-                <div class="text-center py-4">
-                    <p class="text-muted small">No reminders set.</p>
-                </div>
-                {% endfor %}
+                {% endif %}
             </div>
         </div>
     </div>

@@ -3,58 +3,72 @@
 {% block title %}Projects | Dovepeak Projects Log{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<!-- Page Header -->
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
     <div>
-        <h2 class="fw-bold mb-1">Projects</h2>
-        <p class="text-muted">Manage all your projects and their progress.</p>
+        <h1 class="h3 mb-1">Projects</h1>
+        <p class="text-muted mb-0">Manage all your projects and track their progress.</p>
     </div>
-    <div class="d-flex gap-3 align-items-center">
-        <form method="get" class="d-flex">
-            <div class="input-group">
+    <a href="{% url 'project_create' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>New Project
+    </a>
+</div>
+
+<!-- Search & Filters -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body py-3">
+        <form method="get" class="d-flex align-items-center gap-3">
+            <div class="input-group" style="max-width: 400px;">
                 <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                 <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Search projects..." value="{{ request.GET.q }}">
             </div>
+            <button type="submit" class="btn btn-outline-secondary">
+                <i class="fas fa-search me-1"></i>Search
+            </button>
         </form>
-        <a href="{% url 'project_create' %}" class="btn btn-primary text-nowrap">
-            <i class="fas fa-plus me-2"></i> Create New Project
-        </a>
     </div>
 </div>
 
-<div class="card shadow-sm border-0">
+<!-- Projects Table -->
+<div class="card border-0 shadow-sm">
     <div class="card-body p-0">
+        {% if projects %}
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover mb-0">
                 <thead class="bg-light">
                     <tr>
-                        <th class="ps-4">Project Name</th>
+                        <th class="ps-4 rounded-top-0">Project Name</th>
                         <th>Client</th>
                         <th>Deadline</th>
                         <th>Status</th>
                         <th>Progress</th>
-                        <th class="text-end pe-4">Actions</th>
+                        <th class="text-end pe-4 rounded-top-0">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for project in projects %}
-                    <tr>
+                    <tr class="align-middle">
                         <td class="ps-4">
                             <div class="d-flex align-items-center">
                                 <div class="bg-primary bg-opacity-10 text-primary p-2 rounded me-3">
                                     <i class="fas fa-folder-open"></i>
                                 </div>
                                 <div>
-                                    <a href="{% url 'project_detail' project.id %}" class="text-decoration-none fw-bold text-dark d-block text-truncate" style="max-width: 250px;">{{ project.name }}</a>
+                                    <a href="{% url 'project_detail' project.id %}" class="text-decoration-none fw-bold text-dark d-block">{{ project.name }}</a>
                                     {% if project.is_overdue %}
-                                    <span class="badge bg-danger p-1" style="font-size: 0.65rem;">OVERDUE</span>
+                                    <span class="badge bg-danger p-1 mt-1" style="font-size: 0.65rem;"><i class="fas fa-exclamation-circle me-1"></i>OVERDUE</span>
                                     {% endif %}
                                 </div>
                             </div>
                         </td>
-                        <td>{{ project.client|default:"-" }}</td>
                         <td>
-                            <i class="far fa-calendar-alt text-muted me-1"></i>
-                            {{ project.deadline|date:"M d, Y" }}
+                            <span class="text-muted">{{ project.client|default:"-" }}</span>
+                        </td>
+                        <td>
+                            <small class="{% if project.is_overdue %}text-danger fw-medium{% else %}text-muted{% endif %}">
+                                <i class="far fa-calendar-alt me-1"></i>
+                                {{ project.deadline|date:"M d, Y" }}
+                            </small>
                         </td>
                         <td>
                             <span class="badge 
@@ -67,19 +81,19 @@
                         </td>
                         <td style="min-width: 140px;">
                             <div class="d-flex align-items-center gap-2">
-                                <div class="progress flex-grow-1">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: {{ project.progress|default:0 }}%;"></div>
+                                <div class="progress flex-grow-1" style="height: 6px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: {{ project.progress|default:'0' }}%"></div>
                                 </div>
-                                <small class="fw-medium">{{ project.progress|floatformat:0 }}%</small>
+                                <small class="fw-medium" style="min-width: 35px;">{{ project.progress|floatformat:0 }}%</small>
                             </div>
                         </td>
-                        <td class="text-end pe-4">
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-light border" type="button" data-bs-toggle="dropdown">
+                        <td class="text-end pe-4" style="overflow: visible;">
+                            <div class="dropdown position-relative">
+                                <button class="btn btn-sm btn-light border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-ellipsis-v"></i>
                                 </button>
-                                <ul class="dropdown-menu shadow">
-                                    <li><a class="dropdown-item" href="{% url 'project_detail' project.id %}"><i class="fas fa-eye me-2 text-muted"></i> View Detail</a></li>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                    <li><a class="dropdown-item" href="{% url 'project_detail' project.id %}"><i class="fas fa-eye me-2 text-muted"></i> View Details</a></li>
                                     <li><a class="dropdown-item" href="{% url 'project_update' project.id %}"><i class="fas fa-edit me-2 text-muted"></i> Edit</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item text-danger" href="{% url 'project_delete' project.id %}"><i class="fas fa-trash me-2"></i> Delete</a></li>
@@ -87,20 +101,28 @@
                             </div>
                         </td>
                     </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="text-center py-5">
-                            <div class="py-4">
-                                <i class="fas fa-folder-plus fa-4x text-light mb-3"></i>
-                                <h5 class="text-muted">No projects created yet.</h5>
-                                <a href="{% url 'project_create' %}" class="btn btn-primary mt-3">Start First Project</a>
-                            </div>
-                        </td>
-                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        {% else %}
+        <div class="empty-state py-5">
+            <div class="empty-state-icon">
+                <i class="fas fa-folder-plus"></i>
+            </div>
+            <h5>No projects found</h5>
+            <p class="text-muted">
+                {% if request.GET.q %}
+                No projects match your search. Try a different search term.
+                {% else %}
+                Get started by creating your first project.
+                {% endif %}
+            </p>
+            <a href="{% url 'project_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Create Project
+            </a>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

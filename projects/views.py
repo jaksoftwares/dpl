@@ -33,9 +33,11 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         # Upcoming deadlines (within 7 days)
         context['upcoming_deadlines'] = base_qs.filter(
             deadline__range=[today, next_week]
-        ).exclude(status='COMPLETED')
+        ).exclude(status='COMPLETED').order_by('deadline')
 
-        # Recent activities or summary can be added here
+        # Recent projects (most recently updated)
+        context['recent_projects'] = base_qs.order_by('-updated_at')[:5]
+        
         return context
 
 # Project Views

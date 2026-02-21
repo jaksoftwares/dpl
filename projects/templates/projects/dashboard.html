@@ -3,6 +3,17 @@
 {% block title %}Dashboard | Dovepeak Projects Log{% endblock %}
 
 {% block content %}
+<!-- Page Header -->
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="h3 mb-1">Dashboard</h1>
+        <p class="text-muted mb-0">Welcome back! Here's an overview of your projects.</p>
+    </div>
+    <a href="{% url 'project_create' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>New Project
+    </a>
+</div>
+
 <div class="row g-4 mb-4">
     <!-- Stat Cards -->
     <div class="col-md-3">
@@ -54,37 +65,42 @@
 <div class="row g-4">
     <!-- Recent Projects -->
     <div class="col-lg-8">
-        <div class="card h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span>Recent Projects</span>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white border-0 py-3">
+                <span class="fw-semibold"><i class="fas fa-layer-group me-2 text-primary"></i>Recent Projects</span>
                 <a href="{% url 'project_list' %}" class="btn btn-sm btn-outline-secondary">View All</a>
             </div>
             <div class="card-body p-0">
+                {% if recent_projects %}
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover mb-0">
                         <thead class="bg-light">
                             <tr>
-                                <th class="ps-4">Project</th>
+                                <th class="ps-4 rounded-top-0">Project</th>
                                 <th>Client</th>
                                 <th>Deadline</th>
                                 <th>Progress</th>
-                                <th class="pe-4">Status</th>
+                                <th class="pe-4 rounded-top-0">Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for project in upcoming_deadlines|slice:":5" %}
-                            <tr>
+                            {% for project in recent_projects %}
+                            <tr class="align-middle">
                                 <td class="ps-4">
                                     <a href="{% url 'project_detail' project.id %}" class="text-decoration-none fw-semibold text-dark">{{ project.name }}</a>
                                 </td>
                                 <td>{{ project.client|default:"-" }}</td>
-                                <td>{{ project.deadline|date:"M d, Y" }}</td>
+                                <td>
+                                    <small class="{% if project.is_overdue %}text-danger{% else %}text-muted{% endif %}">
+                                        <i class="far fa-calendar-alt me-1"></i>{{ project.deadline|date:"M d, Y" }}
+                                    </small>
+                                </td>
                                 <td style="width: 150px;">
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="progress flex-grow-1">
-                                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ project.progress }}%"></div>
+                                        <div class="progress flex-grow-1" style="height: 6px;">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ project.progress|default:'0' }}%"></div>
                                         </div>
-                                        <small class="text-muted">{{ project.progress|floatformat:0 }}%</small>
+                                        <small class="text-muted fw-medium" style="min-width: 35px;">{{ project.progress|floatformat:0 }}%</small>
                                     </div>
                                 </td>
                                 <td class="pe-4">
@@ -97,42 +113,54 @@
                                     </span>
                                 </td>
                             </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">No projects found.</td>
-                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
+                {% else %}
+                <div class="empty-state py-5">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <h5>No projects yet</h5>
+                    <p>Create your first project to get started tracking your work.</p>
+                    <a href="{% url 'project_create' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-2"></i>Create Project
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Upcoming Reminders -->
+    <!-- Upcoming Deadlines -->
     <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-header">
-                Upcoming Deadlines (7 Days)
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <span class="fw-semibold"><i class="fas fa-clock me-2 text-warning"></i>Upcoming Deadlines</span>
             </div>
-            <div class="card-body">
-                {% for project in upcoming_deadlines %}
-                <div class="d-flex align-items-start mb-3 pb-3 border-bottom">
-                    <div class="bg-light rounded p-2 me-3 text-center" style="min-width: 50px;">
-                        <span class="d-block fw-bold fs-5">{{ project.deadline|date:"d" }}</span>
-                        <small class="text-muted text-uppercase">{{ project.deadline|date:"M" }}</small>
+            <div class="card-body pt-0">
+                {% if upcoming_deadlines %}
+                    {% for project in upcoming_deadlines %}
+                    <a href="{% url 'project_detail' project.id %}" class="d-flex align-items-start mb-3 pb-3 border-bottom text-decoration-none text-dark">
+                        <div class="bg-light rounded p-2 me-3 text-center" style="min-width: 50px;">
+                            <span class="d-block fw-bold fs-5">{{ project.deadline|date:"d" }}</span>
+                            <small class="text-muted text-uppercase" style="font-size: 0.65rem;">{{ project.deadline|date:"M" }}</small>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 fw-bold">{{ project.name }}</h6>
+                            <small class="text-muted"><i class="far fa-clock me-1"></i>Due {{ project.deadline|timeuntil }}</small>
+                        </div>
+                    </a>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state py-4">
+                    <div class="empty-state-icon" style="width: 60px; height: 60px;">
+                        <i class="fas fa-calendar-check"></i>
                     </div>
-                    <div>
-                        <h6 class="mb-1 fw-bold">{{ project.name }}</h6>
-                        <small class="text-muted"><i class="far fa-clock me-1"></i> Due in {{ project.deadline|timeuntil }}</small>
-                    </div>
+                    <p class="text-muted small mb-0">No critical deadlines soon.</p>
                 </div>
-                {% empty %}
-                <div class="text-center py-4">
-                    <i class="fas fa-calendar-check fa-3x text-light mb-3"></i>
-                    <p class="text-muted">No critical deadlines soon.</p>
-                </div>
-                {% endfor %}
+                {% endif %}
             </div>
         </div>
     </div>

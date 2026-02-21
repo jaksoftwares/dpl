@@ -3,42 +3,63 @@
 {% block title %}Set Reminder | Dovepeak Projects Log{% endblock %}
 
 {% block content %}
+<!-- Navigation -->
+<div class="d-flex align-items-center mb-4">
+    <a href="{% url 'reminder_list' %}" class="btn-back">
+        <i class="fas fa-arrow-left me-2"></i>Back
+    </a>
+</div>
+
 <div class="row justify-content-center">
     <div class="col-lg-6">
-        <h2 class="fw-bold mb-4">Set Reminder</h2>
+        <!-- Page Header -->
+        <div class="page-header mb-4">
+            <h1 class="h3 mb-1">Set Reminder</h1>
+            <p class="text-muted mb-0">Create a reminder to stay on top of your projects.</p>
+        </div>
         
         {% if form.errors %}
         <div class="alert alert-danger shadow-sm border-0 mb-4">
-            <p class="mb-0 small"><i class="fas fa-exclamation-circle me-2"></i> Please correct the errors below.</p>
+            <i class="fas fa-exclamation-circle me-2"></i>Please correct the errors below.
         </div>
         {% endif %}
 
-        <div class="card shadow-sm border-0">
+        <div class="card border-0 shadow-sm">
             <div class="card-body p-4">
                 <form method="post" novalidate>
                     {% csrf_token %}
                     
-                    <div class="mb-3">
+                    <div class="form-group">
                         <label for="id_project" class="form-label fw-semibold">Select Project</label>
-                        {{ form.project }}
+                        <div class="input-icon-wrapper">
+                            <i class="fas fa-folder input-icon"></i>
+                            {{ form.project }}
+                        </div>
                         {% for error in form.project.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
                     </div>
 
-                    <div class="mb-3">
+                    <div class="form-group">
                         <label for="id_reminder_date" class="form-label fw-semibold">Reminder Date</label>
-                        <input type="date" name="reminder_date" id="id_reminder_date" class="form-control {% if form.reminder_date.errors %}is-invalid{% endif %}" value="{{ form.reminder_date.value|date:'Y-m-d'|default:'' }}" required>
+                        <div class="input-icon-wrapper">
+                            <i class="fas fa-calendar input-icon"></i>
+                            <input type="date" name="reminder_date" id="id_reminder_date" class="form-control {% if form.reminder_date.errors %}is-invalid{% endif %}" value="{{ form.reminder_date.value|date:'Y-m-d'|default:'' }}" required>
+                        </div>
                         {% for error in form.reminder_date.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
 
-                    <div class="mb-3">
+                    <div class="form-group">
                         <label for="id_message" class="form-label fw-semibold">Message</label>
                         <textarea name="message" id="id_message" class="form-control {% if form.message.errors %}is-invalid{% endif %}" rows="3" placeholder="What should we remind you about?">{{ form.message.value|default:'' }}</textarea>
                         {% for error in form.message.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
 
                     <div class="mt-4 pt-3 border-top d-flex gap-2">
-                        <button type="submit" class="btn btn-primary px-4">Create Reminder</button>
-                        <a href="{% url 'reminder_list' %}" class="btn btn-light border px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-bell me-2"></i>Create Reminder
+                        </button>
+                        <a href="{% url 'reminder_list' %}" class="btn btn-light border px-4">
+                            Cancel
+                        </a>
                     </div>
                 </form>
             </div>
@@ -51,8 +72,8 @@
     select#id_project {
         display: block;
         width: 100%;
-        padding: 0.375rem 2.25rem 0.375rem 0.75rem;
-        font-size: 1rem;
+        padding: 0.625rem 0.875rem;
+        font-size: 0.9375rem;
         font-weight: 400;
         line-height: 1.5;
         color: #212529;
@@ -61,9 +82,15 @@
         background-repeat: no-repeat;
         background-position: right 0.75rem center;
         background-size: 16px 12px;
-        border: 1px solid #dee2e6;
-        border-radius: 0.375rem;
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
         appearance: none;
+        transition: all 0.2s ease;
+    }
+    select#id_project:focus {
+        border-color: var(--dpl-blue);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        outline: none;
     }
     select#id_project.is-invalid {
         border-color: #dc3545;

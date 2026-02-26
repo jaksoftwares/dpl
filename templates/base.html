@@ -619,8 +619,14 @@
             <a href="{% url 'project_list' %}" class="nav-link {% if 'project' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-briefcase"></i> Projects
             </a>
+            <a href="{% url 'product_list' %}" class="nav-link {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-box"></i> Products
+            </a>
             <a href="{% url 'reminder_list' %}" class="nav-link {% if 'reminder' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-bell"></i> Reminders
+            </a>
+            <a href="{% url 'reports_dashboard' %}" class="nav-link {% if 'reports' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-chart-line"></i> Reports
             </a>
             <div class="mt-auto pt-4">
                 <hr class="mx-3 opacity-10">
@@ -709,5 +715,6 @@
             document.getElementById('sidebar').classList.toggle('active');
         }
     </script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}DPL | My Finished Products{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h2 class="fw-bold mb-1">My Products</h2>
+        <p class="text-muted">Inventory of all finished tools and systems created.</p>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'product_create' %}" class="btn btn-primary d-flex align-items-center gap-2">
+            <i class="fas fa-plus"></i> New Product
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for product in products %}
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm card-hover">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="icon-box bg-primary bg-opacity-10 text-primary">
+                        <i class="fas fa-cube fa-lg"></i>
+                    </div>
+                    {% if product.version %}
+                    <span class="badge bg-light text-dark border">v{{ product.version }}</span>
+                    {% endif %}
+                </div>
+                <h5 class="fw-bold mb-2">{{ product.name }}</h5>
+                <p class="text-muted small mb-3 text-truncate-2">{{ product.description }}</p>
+                
+                <div class="mb-3">
+                    {% if product.link %}
+                    <a href="{{ product.link }}" target="_blank" class="btn btn-sm btn-outline-primary w-100 mb-2">
+                        <i class="fas fa-external-link-alt me-1"></i> Visit Product
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'product_detail' product.pk %}" class="btn btn-sm btn-light w-100">
+                        View Details
+                    </a>
+                </div>
+                
+                <div class="pt-3 border-top mt-auto">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="far fa-calendar-alt me-1"></i> {{ product.creation_date }}
+                        </small>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-icon-sm" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v text-muted"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'product_update' product.pk %}"><i class="fas fa-edit me-2"></i> Edit</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'product_delete' product.pk %}"><i class="fas fa-trash-alt me-2"></i> Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-5 text-center">
+            <div class="empty-state">
+                <div class="empty-state-icon text-muted opacity-25">
+                    <i class="fas fa-box-open fa-3x"></i>
+                </div>
+                <h5>No products recorded yet</h5>
+                <p>Start keeping track of your finished works for better accountability.</p>
+                <a href="{% url 'product_create' %}" class="btn btn-primary mt-3">
+                    Record Your First Product
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}

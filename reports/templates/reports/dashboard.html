@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}DPL | Reports & Analytics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+    .metric-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: transform 0.2s;
+    }
+    .metric-card:hover {
+        transform: translateY(-5px);
+    }
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h2 class="fw-bold mb-1">Project Reports</h2>
+        <p class="text-muted">Analyze your completion performance and project distribution.</p>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'export_projects_csv' %}" class="btn btn-primary d-flex align-items-center gap-2">
+            <i class="fas fa-file-export"></i> Export CSV
+        </a>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="card metric-card h-100 p-3">
+            <div class="d-flex align-items-center mb-3">
+                <div class="icon-box bg-primary bg-opacity-10 text-primary me-3">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <h6 class="mb-0 text-muted fw-medium">Completed</h6>
+            </div>
+            <h2 class="mb-0 fw-bold">{{ completed_count }}</h2>
+            <small class="text-muted">Total finished projects</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card h-100 p-3">
+            <div class="d-flex align-items-center mb-3">
+                <div class="icon-box bg-success bg-opacity-10 text-success me-3">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h6 class="mb-0 text-muted fw-medium">On-Time</h6>
+            </div>
+            <h2 class="mb-0 fw-bold">{{ on_time_count }}</h2>
+            <small class="text-muted">Finished by deadline</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card h-100 p-3">
+            <div class="d-flex align-items-center mb-3">
+                <div class="icon-box bg-danger bg-opacity-10 text-danger me-3">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h6 class="mb-0 text-muted fw-medium">Overdue</h6>
+            </div>
+            <h2 class="mb-0 fw-bold">{{ overdue_count }}</h2>
+            <small class="text-muted">Missed deadlines</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card h-100 p-3">
+            <div class="d-flex align-items-center mb-3">
+                <div class="icon-box bg-info bg-opacity-10 text-info me-3">
+                    <i class="fas fa-stopwatch"></i>
+                </div>
+                <h6 class="mb-0 text-muted fw-medium">Avg Duration</h6>
+            </div>
+            <h2 class="mb-0 fw-bold">{{ avg_duration }} <small class="text-muted h6">days</small></h2>
+            <small class="text-muted">Average completion time</small>
+        </div>
+    </div>
+</div>
+
+<!-- Visualization Row -->
+<div class="row g-4 mb-5">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h5 class="card-title fw-bold mb-0">Completion Trend</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h5 class="card-title fw-bold mb-0">Status Distribution</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="chart-container d-flex align-items-center justify-content-center">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h5 class="card-title fw-bold mb-0">Deadline Performance</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                <h5 class="card-title fw-bold mb-0">Latest Completed Projects</h5>
+                <a href="{% url 'project_list' %}?status=COMPLETED" class="btn btn-sm btn-link">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 px-4">Project</th>
+                                <th class="border-0">Completed</th>
+                                <th class="border-0">Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in completed_projects %}
+                            <tr>
+                                <td class="px-4">
+                                    <div class="fw-semibold">{{ p.name }}</div>
+                                    <small class="text-muted">{{ p.client|default:"No Client" }}</small>
+                                </td>
+                                <td>{{ p.completed_at|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if p.completed_at.date <= p.deadline %}
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill">On-Time</span>
+                                    {% else %}
+                                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill">Overdue</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">No completed projects yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Colors
+    const colors = {
+        primary: '#2563EB',
+        success: '#10B981',
+        danger: '#EF4444',
+        info: '#3B82F6',
+        warning: '#F59E0B',
+        gray: '#64748B'
+    };
+
+    // Trend Chart
+    new Chart(document.getElementById('trendChart'), {
+        type: 'line',
+        data: {
+            labels: {{ trend_labels_json|safe }},
+            datasets: [{
+                label: 'Completions',
+                data: {{ trend_values_json|safe }},
+                borderColor: colors.primary,
+                backgroundColor: colors.primary + '10',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: colors.primary
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+
+    // Status Chart
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ status_labels_json|safe }},
+            datasets: [{
+                data: {{ status_values_json|safe }},
+                backgroundColor: [
+                    colors.gray,
+                    colors.primary,
+                    colors.warning,
+                    colors.success,
+                    colors.danger
+                ],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                }
+            }
+        }
+    });
+
+    // Performance Chart
+    new Chart(document.getElementById('performanceChart'), {
+        type: 'bar',
+        data: {
+            labels: ['On-Time', 'Overdue'],
+            datasets: [{
+                label: 'Projects',
+                data: {{ performance_data_json|safe }},
+                backgroundColor: [colors.success, colors.danger],
+                borderRadius: 8,
+                barThickness: 40
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

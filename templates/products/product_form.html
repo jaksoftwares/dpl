@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}DPL | {% if object %}Edit Product{% else %}Add New Product{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <a href="{% url 'product_list' %}" class="btn-back mb-4">
+            <i class="fas fa-arrow-left"></i> Back to Products
+        </a>
+        
+        <div class="card border-0 shadow-sm p-4">
+            <h3 class="fw-bold mb-4">{% if object %}Update Product Details{% else %}Record New Product{% endif %}</h3>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label class="form-label">Product Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g. Invoicing Tool" value="{{ form.name.value|default:'' }}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Version</label>
+                            <input type="text" name="version" class="form-control" placeholder="v1.0" value="{{ form.version.value|default:'' }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Live Link / Repository URL</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-link input-icon"></i>
+                        <input type="url" name="link" class="form-control" placeholder="https://example.com" value="{{ form.link.value|default:'' }}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Use Case / Description</label>
+                    <textarea name="description" class="form-control" rows="4" placeholder="Describe what this product is used for..." required>{{ form.description.value|default:'' }}</textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Finished/Creation Date</label>
+                            <input type="date" name="creation_date" class="form-control" value="{{ form.creation_date.value|date:'Y-m-d'|default:'' }}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Tech Stack</label>
+                            <input type="text" name="tech_stack" class="form-control" placeholder="Django, React, Flutter, etc." value="{{ form.tech_stack.value|default:'' }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Originating Project Reference</label>
+                    <input type="text" name="project_ref" class="form-control" placeholder="Project name or ID that led to this" value="{{ form.project_ref.value|default:'' }}">
+                    <small class="text-muted">Useful for tracing back to the original development project.</small>
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary py-2 fw-semibold">
+                        {% if object %}Save Changes{% else %}Record Product{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

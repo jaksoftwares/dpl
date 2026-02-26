@@ -23,12 +23,24 @@ class Project(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['-deadline']
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old_project = Project.objects.get(pk=self.pk)
+            if self.status == 'COMPLETED' and old_project.status != 'COMPLETED':
+                self.completed_at = timezone.now()
+            elif self.status != 'COMPLETED' and old_project.status == 'COMPLETED':
+                self.completed_at = None
+        elif self.status == 'COMPLETED':
+            self.completed_at = timezone.now()
+        super().save(*args, **kwargs)
 
     @property
     def is_overdue(self):
@@ -49,9 +61,15 @@ class Project(models.Model):
         
         # Status automation
         if self.progress >= 100:
+            if self.status != 'COMPLETED':
+                self.completed_at = timezone.now()
             self.status = 'COMPLETED'
         elif self.progress > 0 and self.status == 'NOT_STARTED':
             self.status = 'IN_PROGRESS'
+            self.completed_at = None
+        elif self.progress < 100 and self.status == 'COMPLETED':
+            self.status = 'IN_PROGRESS'
+            self.completed_at = None
             
         self.save()
 

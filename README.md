@@ -1,5 +1,7 @@
 🕊️ Dovepeak Projects Log (DPL)
 
+![Dashboard](static/images/dashboard.png)
+
 DPL — Dovepeak Projects Log is a focused, professional Django-based project tracking system designed to help individuals or small teams manage, monitor, and complete projects without losing oversight.
 
 It provides a structured workspace to track timelines, progress, tasks, reminders, and overall project performance.

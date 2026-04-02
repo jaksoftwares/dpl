@@ -55,7 +55,6 @@ celerybeat-schedule
 celerybeat.pid
 
 # Static and media (in development)
-static/
 staticfiles/
 media/
 

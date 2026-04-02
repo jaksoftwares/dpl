@@ -265,3 +265,10 @@ Internal operations tracking
  Vision
 
 Dovepeak Projects Log is designed to be the central command center for all ongoing and completed work — ensuring no project is forgotten and every deadline is respected.
+
+
+
+
+
+
+In this application i want us to add a functionality, in the addition of a projects form , we should allow the user to select the type of project, (could be web application, domains, SEO, Mobile Application , or other ( just default , this field is not a must but impotrant in that when the user selects the type of application it is then possible to have a prefilled list of the tasks for that given application. that are editable and he can add more tasks or delete some that are not necessary, so that it is easier to track the taslks of projects in a given category. 

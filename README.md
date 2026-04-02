@@ -1,4 +1,4 @@
-🕊️ Dovepeak Projects Log (DPL)
+Dovepeak Projects Log (DPL)
 
 ![Dashboard](static/images/dashboard.png)
 
